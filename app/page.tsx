@@ -56,6 +56,7 @@ export default function Home() {
         <input
           type="file"
           accept="image/*"
+          capture="environment"
           className="border p-2 rounded"
           onChange={(e) => setFile(e.target.files?.[0] || null)}
         />
