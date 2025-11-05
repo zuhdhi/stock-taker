@@ -36,12 +36,7 @@ export default function Home() {
   return (
 
     <main className="flex flex-col items-center justify-center min-h-screen p-6">
-            <a
-        href="/stock-entries"
-        className="mt-4 inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-      >
-        View All Stock Entries
-      </a>
+        
       <h1 className="text-2xl font-bold mb-4">📦 Stock Upload</h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-3 w-80">
         <input
@@ -70,6 +65,12 @@ export default function Home() {
         >
           Upload
         </button>
+            <a
+        href="/stock-entries"
+        className="mt-4 inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+      >
+        View All Stock Entries
+      </a>
       </form>
       {message && <p className="mt-4">{message}</p>}
     </main>

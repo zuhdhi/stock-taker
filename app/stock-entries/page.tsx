@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
+import ExportButton from '@/components/ExportButton';
 
 interface StockEntry {
   id: number;
@@ -9,7 +10,6 @@ interface StockEntry {
   uploaded_at: string;
 }
 
-// Number of entries per page
 const PAGE_SIZE = 25;
 
 interface Props {
@@ -21,16 +21,13 @@ export default async function StockEntriesPage({ searchParams }: Props) {
   const from = (page - 1) * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
 
-  // Fetch page of entries
   const { data, error, count } = await supabase
     .from('stocks')
-    .select('*', { count: 'exact' }) // get total count for pagination
+    .select('*', { count: 'exact' })
     .order('uploaded_at', { ascending: false })
     .range(from, to);
 
   const entries: StockEntry[] = data ?? [];
-
-  if (error) return <p>Error fetching stock entries: {error.message}</p>;
 
   const totalPages = count ? Math.ceil(count / PAGE_SIZE) : 1;
 
@@ -38,7 +35,7 @@ export default async function StockEntriesPage({ searchParams }: Props) {
     <main className="p-8">
       <h1 className="text-2xl font-bold mb-6">📦 Stock Entries (Page {page})</h1>
 
-      {entries.length === 0 && <p>No stock entries found.</p>}
+      <ExportButton entries={entries} />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-6">
         {entries.map((entry) => (
@@ -60,7 +57,6 @@ export default async function StockEntriesPage({ searchParams }: Props) {
         ))}
       </div>
 
-      {/* Pagination Controls */}
       <div className="flex justify-center gap-2">
         {page > 1 && (
           <Link
