@@ -5,34 +5,44 @@ import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
   const formData = await req.formData();
+
   const file = formData.get('file') as File;
   const name = formData.get('name') as string;
   const quantity = Number(formData.get('quantity'));
+  const dimensions = formData.get('dimensions') as string; // match form field
+  const barcode = formData.get('barcode') as string;       // new field
 
-  if (!file || !name) {
+  if (!file || !name || !quantity) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
   }
 
-  // Upload to Vercel Blob
-  const blob = await put(file.name, file, {
-    access: 'public',
-    token: process.env.BLOB_READ_WRITE_TOKEN,
-  });
+  try {
+    // Upload to Vercel Blob
+    const blob = await put(file.name, file, {
+      access: 'public',
+      token: process.env.BLOB_READ_WRITE_TOKEN,
+    });
 
-  // Save metadata to Supabase
-  const { error } = await supabase.from('stocks').insert([
-    {
-      name,
-      quantity,
-      image_url: blob.url,
-      uploaded_at: new Date().toISOString(),
-    },
-  ]);
+    // Save metadata to Supabase
+    const { error } = await supabase.from('stocks').insert([
+      {
+        name,
+        quantity,
+        dimensions,
+        barcode,          // store barcode in DB
+        image_url: blob.url,
+        uploaded_at: new Date().toISOString(),
+      },
+    ]);
 
-  if (error) {
-    console.error(error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error) {
+      console.error(error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true, url: blob.url });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
   }
-
-  return NextResponse.json({ success: true, url: blob.url });
 }
