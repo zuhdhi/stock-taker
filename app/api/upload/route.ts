@@ -11,8 +11,9 @@ export async function POST(req: Request) {
   const quantity = Number(formData.get('quantity'));
   const dimensions = formData.get('dimensions') as string; // match form field
   const barcode = formData.get('barcode') as string;       // new field
+  const location = formData.get('location') as string;
 
-  if (!file || !name || !quantity) {
+  if (!file || !location) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
   }
 
@@ -30,6 +31,7 @@ export async function POST(req: Request) {
         quantity,
         dimensions,
         barcode,          // store barcode in DB
+        location,
         image_url: blob.url,
         uploaded_at: new Date().toISOString(),
       },

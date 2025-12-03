@@ -8,16 +8,19 @@ export default function Home() {
   const [name, setName] = useState('');
   const [quantity, setQuantity] = useState('');
   const [dimension, setDimensions] = useState('');
+  const [location, setLocation] = useState('');
   const [barcode, setBarcode] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [scanning, setScanning] = useState(false);
 
+  const [kellogs, setKellog] = useState('');
   // Barcode scanner effect
   useEffect(() => {
     if (!scanning) return;
 
     let scanner: any;
+   
 
     import('html5-qrcode').then(({ Html5QrcodeScanner }) => {
       scanner = new Html5QrcodeScanner(
@@ -47,7 +50,7 @@ export default function Home() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!file || !name || !quantity) {
+    if (!file || !location) {
       setMessage('⚠️ Please fill in all fields');
       return;
     }
@@ -61,15 +64,17 @@ export default function Home() {
     formData.append('quantity', quantity);
     formData.append('dimensions', dimension);
     formData.append('barcode', barcode);
+    formData.append('location', location);
 
     try {
       const res = await fetch('/api/upload', { method: 'POST', body: formData });
       const data = await res.json();
       if (data.success) {
-        setMessage(`✅ Uploaded successfully: ${data.url}`);
+        setMessage(`✅ Uploaded successfully`);
         setName('');
         setQuantity('');
         setDimensions('');
+        setLocation('');
         setBarcode('');
         setFile(null);
       } else {
@@ -83,145 +88,122 @@ export default function Home() {
     }
   };
 
-  return (
-    <main
-      className={`min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-white to-blue-50 ${GeistSans.className}`}
-    >
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-100 w-full max-w-md p-8 transition-transform duration-300 hover:shadow-xl">
-        <h1 className="text-3xl font-semibold text-center text-gray-800 mb-6">
-          📦 Upload New Stock
-        </h1>
+return (
+  <main
+    className={`min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-white to-blue-50 ${GeistSans.className}`}
+  >
+    <div className="bg-white rounded-2xl shadow-lg border border-gray-100 w-full max-w-md p-8 transition-transform duration-300 hover:shadow-xl">
+      <h1 className="text-3xl font-semibold text-center text-gray-800 mb-6">
+        📦 Upload New Stock
+      </h1>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          {/* Barcode */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Barcode
-            </label>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                placeholder="Scan or type barcode"
-                className="flex-1 border border-gray-300 rounded-lg p-2.5 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-black"
-                value={barcode}
-                onChange={(e) => setBarcode(e.target.value)}
-              />
-              <button
-                type="button"
-                onClick={() => setScanning(true)}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-3 rounded-lg"
-              >
-                📷
-              </button>
-            </div>
-          </div>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
 
-          {/* Item Name */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Item Name
-            </label>
-            <input
-              type="text"
-              placeholder="Enter item name"
-              className="w-full border border-gray-300 rounded-lg p-2.5 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-black"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </div>
+        {/* Item Name */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Item Name
+          </label>
+          <input
+            type="text"
+            placeholder="Enter item name"
+            className="w-full border border-gray-300 rounded-lg p-2.5 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-black"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </div>
 
-          {/* Quantity */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Quantity
-            </label>
-            <input
-              type="number"
-              placeholder="Enter quantity"
-              className="w-full border border-gray-300 rounded-lg p-2.5 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-black"
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
-            />
-          </div>
+        {/* Location (Required) */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Location <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            placeholder="Enter location of the item"
+            className="w-full border border-gray-300 rounded-lg p-2.5 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-black"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            required
+          />
+        </div>
 
-          {/* Dimensions */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Dimensions
-            </label>
-            <input
-              type="text"
-              placeholder="Enter item dimensions (e.g., 20x10x5 cm)"
-              className="w-full border border-gray-300 rounded-lg p-2.5 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-black"
-              value={dimension}
-              onChange={(e) => setDimensions(e.target.value)}
-            />
-          </div>
+        {/* Upload Image (Required) */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Upload Image <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="file"
+            accept="image/*"
+            capture="environment"
+            className="w-full border border-gray-300 rounded-lg p-2.5 bg-gray-50 cursor-pointer focus:ring-2 focus:ring-blue-500 transition"
+            onChange={(e) => setFile(e.target.files?.[0] || null)}
+            required
+          />
+        </div>
 
-          {/* Upload Image */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Upload Image
-            </label>
-            <input
-              type="file"
-              accept="image/*"
-              capture="environment"
-              className="w-full border border-gray-300 rounded-lg p-2.5 bg-gray-50 cursor-pointer focus:ring-2 focus:ring-blue-500 transition"
-              onChange={(e) => setFile(e.target.files?.[0] || null)}
-            />
-          </div>
+        {/* Quantity (Hidden) */}
+        <div hidden>
+          <label>Quantity</label>
+          <input
+            type="number"
+            value={quantity}
+            onChange={(e) => setQuantity(e.target.value)}
+          />
+        </div>
 
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg p-2.5 font-medium transition-colors duration-200 disabled:bg-gray-400"
+        {/* Dimensions (Hidden) */}
+        <div hidden>
+          <label>Dimensions</label>
+          <input
+            type="text"
+            value={dimension}
+            onChange={(e) => setDimensions(e.target.value)}
+          />
+        </div>
+
+        {/* Barcode (Hidden) */}
+        <div hidden>
+          <label>Barcode</label>
+          <input
+            type="text"
+            value={barcode}
+            onChange={(e) => setBarcode(e.target.value)}
+          />
+        </div>
+
+        {/* Submit Button */}
+        <button
+          type="submit"
+          disabled={loading}
+          className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg p-2.5 font-medium transition-colors duration-200 disabled:bg-gray-400"
+        >
+          {loading ? 'Uploading...' : 'Upload'}
+        </button>
+
+        {message && (
+          <p
+            className={`text-center text-sm font-medium mt-2 ${
+              message.includes('✅')
+                ? 'text-green-600'
+                : message.includes('⚠️')
+                ? 'text-yellow-600'
+                : 'text-red-600'
+            }`}
           >
-            {loading ? 'Uploading...' : 'Upload'}
-          </button>
-
-          {message && (
-            <p
-              className={`text-center text-sm font-medium mt-2 ${
-                message.includes('✅')
-                  ? 'text-green-600'
-                  : message.includes('⚠️')
-                  ? 'text-yellow-600'
-                  : 'text-red-600'
-              }`}
-            >
-              {message}
-            </p>
-          )}
-
-          <a
-            href="/stock-entries"
-            className="mt-4 text-center bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200"
-          >
-            View All Stock Entries
-          </a>
-        </form>
-
-        {/* Scanner Modal */}
-        {scanning && (
-          <div className="fixed inset-0 bg-black bg-opacity-40 flex flex-col items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl shadow-lg p-4 w-full max-w-md">
-              <p className="text-center text-gray-700 mb-2">
-                Scanning... point camera at barcode
-              </p>
-              <div id="reader" className="w-full mb-3" />
-              <button
-                type="button"
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg w-full"
-                onClick={() => setScanning(false)}
-              >
-                Stop Scanning
-              </button>
-            </div>
-          </div>
+            {message}
+          </p>
         )}
-      </div>
-    </main>
-  );
+
+        <a
+          href="/stock-entries"
+          className="mt-4 text-center bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200"
+        >
+          View All Stock Entries
+        </a>
+      </form>
+    </div>
+  </main>
+);
 }

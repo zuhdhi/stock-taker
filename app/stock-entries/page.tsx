@@ -11,7 +11,7 @@ interface StockEntry {
   image_url: string;
   uploaded_at: string;
   dimensions: string;
-  barcode: string; // ✅ new field
+  barcode: string;
 }
 
 const PAGE_SIZE = 25;
@@ -79,10 +79,10 @@ export default function StockEntriesPage() {
                 Quantity: <span className="font-medium">{entry.quantity}</span>
               </p>
               <p className="text-gray-700 mb-1">
-                Dimensions: <span className="font-medium">{entry.dimensions}</span>
+                Dimensions: <span className="font-medium">{entry.dimensions ?? "No dimensions provided"}</span>
               </p>
               <p className="text-gray-700 mb-1">
-                Barcode: <span className="font-mono text-blue-600">{entry.barcode}</span>
+                Barcode: <span className="font-mono text-blue-600">{entry.barcode ?? "No barcode for this product"}</span>
               </p>
               <p className="text-sm text-gray-500">
                 Uploaded: {new Date(entry.uploaded_at).toLocaleString()}

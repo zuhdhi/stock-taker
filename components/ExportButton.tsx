@@ -31,13 +31,11 @@ export default function ExportButton({ entries }: Props) {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'StockEntries');
 
-    // Generate Excel file
     const excelBuffer = XLSX.write(workbook, {
       bookType: 'xlsx',
       type: 'array',
     });
 
-    // Save file
     const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
     saveAs(blob, 'stock_entries.xlsx');
   };
@@ -50,6 +48,5 @@ export default function ExportButton({ entries }: Props) {
       Export to Excel
     </button>
   );
-  //intialize an error message on success of export
   
 }
